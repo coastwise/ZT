@@ -221,42 +221,55 @@ pub fn GenerateBuffer(comptime T: type, comptime V: usize) type {
             var loc: c_int = gl.glGetUniformLocation(self.shader.id, uniName.ptr);
             self.shader.bind();
             if (loc != -1) {
-                switch (@TypeOf(uniform)) {
-                    bool => {
-                        gl.glUniform1i(loc, if (uniform) 1 else 0);
-                        reportErr("Setting a uniform bool(i32):");
+                const uniformType: type = @TypeOf(uniform);
+                switch (@typeInfo(uniformType))
+                {
+                    .Array => |array| switch (array.child) {
+                        zt.math.Mat4 => {
+                            gl.glUniformMatrix4fv(loc, array.len, 0, &@bitCast([array.len*16]f32, uniform));
+                            reportErr("Setting a uniform mat4:");
+                        },
+                        else => {
+                            @compileError("You cannot use an array of that type in a genbuffer's uniform.");
+                        },
                     },
-                    i32 => {
-                        gl.glUniform1i(loc, uniform);
-                        reportErr("Setting a uniform i32:");
-                    },
-                    u32 => {
-                        gl.glUniform1ui(loc, uniform);
-                        reportErr("Setting a uniform u32:");
-                    },
-                    f32 => {
-                        gl.glUniform1f(loc, uniform);
-                        reportErr("Setting a uniform f32:");
-                    },
-                    zt.math.Vec2 => {
-                        gl.glUniform2f(loc, uniform.x, uniform.y);
-                        reportErr("Setting a uniform vec2:");
-                    },
-                    zt.math.Vec3 => {
-                        gl.glUniform3f(loc, uniform.x, uniform.y, uniform.z);
-                        reportErr("Setting a uniform vec3:");
-                    },
-                    zt.math.Vec4 => {
-                        gl.glUniform4f(loc, uniform.x, uniform.y, uniform.z, uniform.w);
-                        reportErr("Setting a uniform vec4:");
-                    },
-                    zt.math.Mat4 => {
-                        gl.glUniformMatrix4fv(loc, 1, 0, &uniform.inlined());
-                        reportErr("Setting a uniform mat4:");
-                    },
-                    else => {
-                        @compileError("You cannot use that type in a genbuffer's uniform.");
-                    },
+                    else => switch (uniformType) {
+                        bool => {
+                            gl.glUniform1i(loc, if (uniform) 1 else 0);
+                            reportErr("Setting a uniform bool(i32):");
+                        },
+                        i32 => {
+                            gl.glUniform1i(loc, uniform);
+                            reportErr("Setting a uniform i32:");
+                        },
+                        u32 => {
+                            gl.glUniform1ui(loc, uniform);
+                            reportErr("Setting a uniform u32:");
+                        },
+                        f32 => {
+                            gl.glUniform1f(loc, uniform);
+                            reportErr("Setting a uniform f32:");
+                        },
+                        zt.math.Vec2 => {
+                            gl.glUniform2f(loc, uniform.x, uniform.y);
+                            reportErr("Setting a uniform vec2:");
+                        },
+                        zt.math.Vec3 => {
+                            gl.glUniform3f(loc, uniform.x, uniform.y, uniform.z);
+                            reportErr("Setting a uniform vec3:");
+                        },
+                        zt.math.Vec4 => {
+                            gl.glUniform4f(loc, uniform.x, uniform.y, uniform.z, uniform.w);
+                            reportErr("Setting a uniform vec4:");
+                        },
+                        zt.math.Mat4 => {
+                            gl.glUniformMatrix4fv(loc, 1, 0, &uniform.inlined());
+                            reportErr("Setting a uniform mat4:");
+                        },
+                        else => {
+                            @compileError("You cannot use that type in a genbuffer's uniform.");
+                        },
+                    }
                 }
             }
             self.shader.unbind();
