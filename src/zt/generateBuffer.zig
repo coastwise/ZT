@@ -1,9 +1,10 @@
 const gl = @import("gl");
 const std = @import("std");
 const zt = @import("../zt.zig");
+const builtin = @import("builtin");
 
 fn reportErr(msg: []const u8) void {
-    if (std.builtin.mode == .Debug) {
+    if (builtin.mode == .Debug) {
         var err = gl.glGetError();
         while (err != gl.GL_NO_ERROR) {
             switch (err) {
@@ -44,7 +45,7 @@ pub fn GenerateBuffer(comptime T: type, comptime V: usize) type {
 
         vertices: [V]T = undefined,
         vertCount: usize = 0,
-        // Worst case scenario every singl.gle draw is a quad, so * 6.
+        // Worst case scenario every single draw is a quad, so * 6.
         indices: [IndexLimit]c_uint = undefined,
         indCount: usize = 0,
         shader: zt.gl.Shader = undefined,
