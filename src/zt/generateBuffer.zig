@@ -1,5 +1,6 @@
 const gl = @import("gl");
 const std = @import("std");
+const assert = std.debug.assert;
 const zt = @import("../zt.zig");
 const builtin = @import("builtin");
 
@@ -72,21 +73,25 @@ pub fn GenerateBuffer(comptime T: type, comptime V: usize) type {
             inline for (std.meta.fields(T)) |field, i| {
                 switch (field.field_type) {
                     f32 => {
+                        assert(currentOffset == @offsetOf(T, field.name));
                         gl.glVertexAttribPointer(@intCast(c_uint, i), 1, gl.GL_FLOAT, gl.GL_FALSE, stride, @intToPtr(*allowzero c_void, currentOffset));
                         gl.glEnableVertexAttribArray(@intCast(c_uint, i));
                         currentOffset += 4;
                     },
                     zt.math.Vec2 => {
+                        assert(currentOffset == @offsetOf(T, field.name));
                         gl.glVertexAttribPointer(@intCast(c_uint, i), 2, gl.GL_FLOAT, gl.GL_FALSE, stride, @intToPtr(*allowzero c_void, currentOffset));
                         gl.glEnableVertexAttribArray(@intCast(c_uint, i));
                         currentOffset += 8;
                     },
                     zt.math.Vec3 => {
+                        assert(currentOffset == @offsetOf(T, field.name));
                         gl.glVertexAttribPointer(@intCast(c_uint, i), 3, gl.GL_FLOAT, gl.GL_FALSE, stride, @intToPtr(*allowzero c_void, currentOffset));
                         gl.glEnableVertexAttribArray(@intCast(c_uint, i));
                         currentOffset += 12;
                     },
                     zt.math.Vec4 => {
+                        assert(currentOffset == @offsetOf(T, field.name));
                         gl.glVertexAttribPointer(@intCast(c_uint, i), 4, gl.GL_FLOAT, gl.GL_FALSE, stride, @intToPtr(*allowzero c_void, currentOffset));
                         gl.glEnableVertexAttribArray(@intCast(c_uint, i));
                         currentOffset += 16;
