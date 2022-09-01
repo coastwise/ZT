@@ -1,21 +1,23 @@
 const std = @import("std");
 
+fn thisDir() []const u8 {
+    return comptime std.fs.path.dirname(@src().file) orelse ".";
+}
 fn getRelativePath() []const u8 {
-    comptime var src: std.builtin.SourceLocation = @src();
-    return std.fs.path.dirname(src.file).? ++ std.fs.path.sep_str;
+    return comptime thisDir() ++ std.fs.path.sep_str;
 }
 
 pub const stbPkg = std.build.Pkg{
     .name = "stb_image",
-    .path = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/stb_image.zig" },
+    .source = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/stb_image.zig" },
 };
 pub const glPkg = std.build.Pkg{
     .name = "gl",
-    .path = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/gl.zig" },
+    .source = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/gl.zig" },
 };
-pub const imguiPkg = std.build.Pkg{ .name = "imgui", .path = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/imgui.zig" } };
-pub const glfwPkg = std.build.Pkg{ .name = "glfw", .path = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/glfw.zig" } };
-pub const ztPkg = std.build.Pkg{ .name = "zt", .path = std.build.FileSource{ .path = getRelativePath() ++ "src/zt.zig" }, .dependencies = &[_]std.build.Pkg{
+pub const imguiPkg = std.build.Pkg{ .name = "imgui", .source = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/imgui.zig" } };
+pub const glfwPkg = std.build.Pkg{ .name = "glfw", .source = std.build.FileSource{ .path = getRelativePath() ++ "src/pkg/glfw.zig" } };
+pub const ztPkg = std.build.Pkg{ .name = "zt", .source = std.build.FileSource{ .path = getRelativePath() ++ "src/zt.zig" }, .dependencies = &[_]std.build.Pkg{
     glfwPkg,
     glPkg,
     imguiPkg,
