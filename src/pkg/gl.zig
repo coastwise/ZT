@@ -1653,6 +1653,30 @@ pub const GL_TIME_ELAPSED = @import("std").zig.c_translation.promoteIntLiteral(c
 pub const GL_TIMESTAMP = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8E28, .hexadecimal);
 pub const GL_INT_2_10_10_10_REV = @import("std").zig.c_translation.promoteIntLiteral(c_int, 0x8D9F, .hexadecimal);
 pub const GL_VERSION_1_0 = @as(c_int, 1);
+pub const GL_PROGRAM_BINARY_FORMATS: c_int = 0x87FF;
+pub const GL_PROGRAM_BINARY_LENGTH: c_int = 0x8741;
+pub const GL_NUM_PROGRAM_BINARY_FORMATS: c_int = 0x87FE;
+
+const PFNGLGETPROGRAMBINARYPROC = *const fn (GLuint, GLsizei, [*c]GLsizei, [*c]GLenum, ?*const anyopaque) callconv(.C) void;
+extern var glad_glGetProgramBinary: PFNGLGETPROGRAMBINARYPROC;
+
+const PFNGLPROGRAMBINARYPROC = *const fn (GLuint,GLenum,?*const anyopaque,GLsizei ) callconv(.C) void;
+extern var glad_glProgramBinary: PFNGLPROGRAMBINARYPROC;
+
+pub inline fn glProgramBinary(program: GLuint ,
+ 	binaryFormat: GLenum ,
+ 	binary: ?*const anyopaque,
+ 	length: GLsizei ) void {
+        return glad_glProgramBinary(program, binaryFormat,binary,length);
+    }
+pub inline fn glGetProgramBinary(
+    program: GLuint ,
+ 	bufSize: GLsizei,
+ 	length: [*c]GLsizei,
+ 	binaryFormat: [*c]GLenum,
+ 	binary: ?*const anyopaque) void {
+        return glad_glGetProgramBinary(program, bufSize, length, binaryFormat, binary); 
+    }
 pub inline fn glCullFace(arg_2: GLenum) void {
     return glad_glCullFace(arg_2);
 }
